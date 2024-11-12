@@ -24,7 +24,7 @@ def user_sign_up_handler(
         hashed_password = hashed_password
     )
     # 사용자를 DB에 저장
-    user: User = user_repo.save_user(user=user) # 이 시점에서 사용자의 id 값 = int로 들어감
+    user: User = user_repo.save_user(user=user) # 이 시점에서 사용자의 id 값 = int로 들어감, 실제 DB에 사용자가 생성됨
 
     # user(id, username) 값 반환                # 추가
     return UserSchema.from_orm(user)

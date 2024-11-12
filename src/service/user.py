@@ -9,6 +9,7 @@ class UserService:
             - plain_password: string
         output:
             - hashed_password: string
+        function: receives plain-text password and returns hashed password
         '''
         hashed_password: bytes = bcrypt.hashpw(
             plain_password.encode(self.encoding),
