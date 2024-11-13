@@ -45,6 +45,6 @@ class User(Base):
     @classmethod
     def create(cls, username: str, hashed_password: str) -> "User":
         return cls(
-            username = username,
+            username=username,
             password=hashed_password,
         )

@@ -28,3 +28,7 @@ def user_sign_up_handler(
 
     # user(id, username) 값 반환                # 추가
     return UserSchema.from_orm(user)
+
+@router.post("/log-in")
+def user_log_in_handler():
+    return True
