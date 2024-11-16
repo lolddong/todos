@@ -8,7 +8,6 @@ from schema.request import CreateToDoRequest
 
 router = APIRouter(prefix='/todos')
 
-
 # GET Method 사용하여 전체 조회 API
 @router.get("", status_code=200)
 def get_todos_handler(
