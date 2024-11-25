@@ -1,6 +1,6 @@
 # /c/Users/관리자/Desktop/projects/todos/src/service/user.py 내용
 from datetime import datetime, timedelta        # 추가
-from jose import JWTError                       # 추가
+from jose import jwt                       # 추가
 import bcrypt
 import logging
 
