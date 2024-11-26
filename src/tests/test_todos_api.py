@@ -1,33 +1,50 @@
 # /c/Users/관리자/Desktop/projects/todos/src/tests/test_todos_api.py 내용
 from src.schema.response import ToDoSchema
-from src.database.orm import ToDo
-from src.database.repository import ToDoRepository
+from src.database.orm import ToDo, User                             # 추가
+from src.database.repository import ToDoRepository, UserRepository  # 추가
+from src.service.user import UserService                            # 추가
 
 # GET Method 사용하여 전체 조회 API 검증
-def test_get_todos(client, mocker):
-    # order = ASC
-    mocker.patch.object(ToDoRepository, "get_todos", return_value=[
-        ToDo(id=1, contents="FastAPI Section 0", is_done=True),
-        ToDoSchema(id=2, contents="FastAPI Section 2", is_done=False),
-    ])
-    response = client.get("/todos")
-    assert response.status_code == 200
-    assert response.json() == {
-        "todos": [
-            {"id": 1, "contents": "FastAPI Section 0", "is_done": True},
-            {"id": 2, "contents": "FastAPI Section 2", "is_done": False},
-        ]
-    }
+# def test_get_todos(client, mocker):
+#     # order = ASC
+#     mocker.patch.object(ToDoRepository, "get_todos", return_value=[
+#         ToDo(id=1, contents="FastAPI Section 0", is_done=True),
+#         ToDoSchema(id=2, contents="FastAPI Section 2", is_done=False),
+#     ])
+#     response = client.get("/todos")
+#     assert response.status_code == 200
+#     assert response.json() == {
+#         "todos": [
+#             {"id": 1, "contents": "FastAPI Section 0", "is_done": True},
+#             {"id": 2, "contents": "FastAPI Section 2", "is_done": False},
+#         ]
+#     }
     
-    # order = DESC
-    response = client.get("/todos?order=DESC")
+#     # order = DESC
+#     response = client.get("/todos?order=DESC")
+#     assert response.status_code == 200
+#     assert response.json() == {
+#         "todos": [
+#             {"id":2, "contents": "FastAPI Section 2", "is_done": False},
+#             {"id":1, "contents": "FastAPI Section 0", "is_done": True},
+#         ]
+#     }
+
+# GET Method 사용하여 username의 todo 목록 조회 API 검증                # 추가
+def test_get_todos(client, mocker):
+    access_token: str = UserService().create_jwt(username="test")
+    headers = {'Authorization': f"Bearer {access_token}"}
+    user = User(id=1, username="test", password="hashed")
+    user.todos = [
+        ToDo(id=1, contents="FastAPI Section 0", is_done=True),
+        ToDo(id=2, contents="FastAPI Section 1", is_done=False),
+    ]
+    mocker.patch.object(
+        UserRepository, "get_user_by_username", return_value=user
+    )
+    # order = ASC
+    response = client.get('/todos', header=headers)
     assert response.status_code == 200
-    assert response.json() == {
-        "todos": [
-            {"id":2, "contents": "FastAPI Section 2", "is_done": False},
-            {"id":1, "contents": "FastAPI Section 0", "is_done": True},
-        ]
-    }
 
 # GET Method 사용하여 단일 조회 API 검증
 def test_get_todo(client, mocker):

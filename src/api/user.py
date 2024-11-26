@@ -1,7 +1,7 @@
 # /c/Users/관리자/Desktop/projects/todos/src/api/user.py 내용
 from fastapi import Body, HTTPException, Depends, APIRouter
-from src.schema.request import SignUpRequest, LogInRequest  # 추가
-from src.schema.response import UserSchema, JWTResponse     # 추가
+from src.schema.request import SignUpRequest, LogInRequest
+from src.schema.response import UserSchema, JWTResponse
 from src.service.user import UserService
 from src.database.orm import User
 from src.database.repository import UserRepository
@@ -29,7 +29,7 @@ def user_sign_up_handler(
     # user(id, username) 값 반환
     return UserSchema.from_orm(user)
 
-@router.post("/log-in")                     # 추가
+@router.post("/log-in")
 def user_log_in_handler(
     request: LogInRequest,
     user_repo: UserRepository = Depends(),
