@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from typing import List
 from fastapi import Depends
 
-from database.orm import ToDo, User
-from database.connection import get_db
+from src.database.orm import ToDo, User
+from src.database.connection import get_db
 
 class ToDoRepository:
     def __init__(self, session:Session = Depends(get_db)):

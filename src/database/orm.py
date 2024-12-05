@@ -1,7 +1,7 @@
 # /c/Users/관리자/Desktop/projects/todos/src/database/orm.py 내용
 from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
-from schema.request import CreateToDoRequest
+from src.schema.request import CreateToDoRequest
 
 Base = declarative_base()
 

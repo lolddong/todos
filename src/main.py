@@ -1,6 +1,6 @@
 # /c/Users/관리자/Desktop/projects/todos/src/main.py 내용
 from fastapi import FastAPI
-from api import todo, user
+from src.api import todo, user
 
 app = FastAPI()
 app.include_router(todo.router)
