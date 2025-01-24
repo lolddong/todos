@@ -9,7 +9,7 @@ class ToDoSchema(BaseModel):
 
     class Config:
         from_attributes = True
-        orm_mode = True # 이거 추가 해야지 ConfigError 안남
+        # orm_mode = True # 이거 추가 해야지 ConfigError 안남
 
 class ToDoListSchema(BaseModel):
     todos: List[ToDoSchema]
@@ -20,7 +20,7 @@ class UserSchema(BaseModel):
     
     class Config:
         from_attributes = True
-        orm_mode = True # 이거 추가 해야지 ConfigError 안남
+        # orm_mode = True # 이거 추가 해야지 ConfigError 안남
 
 class JWTResponse(BaseModel):
     access_token: str

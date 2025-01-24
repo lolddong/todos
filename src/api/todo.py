@@ -2,25 +2,25 @@
 from fastapi import Body, HTTPException, Depends, APIRouter
 from typing import List	
 
-from src.database.repository import ToDoRepository, ToDo, UserRepository, User # 추가
+from src.database.repository import ToDoRepository, ToDo, UserRepository, User
 from src.schema.response import ToDoSchema, ToDoListSchema
 from src.schema.request import CreateToDoRequest
 from src.security import get_access_token
-from src.service.user import UserService                # 추가
+from src.service.user import UserService
 
 router = APIRouter(prefix='/todos')
 
 # GET Method 사용하여 username의 todo 조회 API          # 변경 (원래: GET Method 사용하여 전체 조회 API)
 @router.get("", status_code=200)
 def get_todos_handler(
-    access_token: str = Depends(get_access_token),	    # 추가
+    access_token: str = Depends(get_access_token),
     order: str | None = None,
-    user_service: UserService = Depends(),              # 추가
+    user_service: UserService = Depends(),
     user_repo: UserRepository = Depends(),
     # todo_repo: ToDoRepository = Depends(),             # 삭제
 ) -> ToDoListSchema:
-    username: str = user_service.decode_jwt(access_token=access_token)  # 추가, 이 username을 통해 사용자를 조회할 것
-    user: User | None = user_repo.get_user_by_username(username=username)  # 추가, 이 user_id를 통해 User(테이블)를 불러와 User에 담긴 ToDo를 조회할 것
+    username: str = user_service.decode_jwt(access_token=access_token)  # 이 username을 통해 사용자 조회
+    user: User | None = user_repo.get_user_by_username(username=username)  # 이 user_id를 통해 User(테이블)를 불러와 User에 담긴 ToDo 조회
     if not user: # 회원 탈퇴, etc. 경우
         raise HTTPException(status_code=404, detail='User Not Found')
     # todos: List[ToDo] = todo_repo.get_todos()         # 삭제
@@ -49,9 +49,9 @@ def get_todo_handler(
 def create_todo_handler(
     request: CreateToDoRequest,
     todo_repo: ToDoRepository = Depends(),
-) -> ToDoSchema:
+    ) -> ToDoSchema:
     todo: ToDo = ToDo.create(request=request)          # id=None
-    todo: ToDo = todo_repo.create_todo(todo=todo) # id=int
+    todo: ToDo = todo_repo.create_todo(todo=todo)      # id=int
     return ToDoSchema.from_orm(todo)
 
 # PATCH Method 사용하여 is_done 값 수정 API

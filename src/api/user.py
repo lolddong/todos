@@ -13,7 +13,7 @@ def user_sign_up_handler(
     request: SignUpRequest,
     user_service: UserService = Depends(),
     user_repo: UserRepository = Depends()
-):
+    ):
     # 해싱된 비밀번호 생성
     hashed_password: str = user_service.hash_password(
         plain_password = request.password
@@ -34,8 +34,7 @@ def user_log_in_handler(
     request: LogInRequest,
     user_repo: UserRepository = Depends(),
     user_service: UserService = Depends(),
-    
-):
+    ):
     # 사용자 정보 DB 조회
     user: User | None = user_repo.get_user_by_username(username=request.username)
     if not user:
