@@ -1,8 +1,8 @@
 # /c/Users/관리자/Desktop/projects/todos/src/tests/test_todos_api.py 내용
 from src.schema.response import ToDoSchema
-from src.database.orm import ToDo, User                             # 추가
-from src.database.repository import ToDoRepository, UserRepository  # 추가
-from src.service.user import UserService                            # 추가
+from src.database.orm import ToDo, User 
+from src.database.repository import ToDoRepository, UserRepository
+from src.service.user import UserService
 
 # GET Method 사용하여 전체 조회 API 검증
 # def test_get_todos(client, mocker):
@@ -30,7 +30,7 @@ from src.service.user import UserService                            # 추가
 #         ]
 #     }
 
-# GET Method 사용하여 username의 todo 목록 조회 API 검증                # 추가
+# GET Method 사용하여 username의 todo 목록 조회 API 검증
 def test_get_todos(client, mocker):
     access_token: str = UserService().create_jwt(username="test")
     headers = {'Authorization': f"Bearer {access_token}"}

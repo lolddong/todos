@@ -37,5 +37,5 @@ def test_user_sign_up(client, mocker):                  # mocker는 fixture
         username=username, hashed_password="hashed"
     )
     
-    assert response.status_code == 201          # 201로 변경
+    assert response.status_code == 201
     assert response.json() == {"id": 1, "username": username}     # 반환값으로 UserRepository.save_user 검증

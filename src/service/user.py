@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from jose import jwt
 import bcrypt
 import logging
+import random           # 추가
 
 class UserService:
     encoding: str = "UTF-8"
@@ -41,9 +42,13 @@ class UserService:
             algorithm=self.jwt_algorithm
         )
     
-    def decode_jwt(self, access_token: str) -> str:       # 추가
+    def decode_jwt(self, access_token: str) -> str:
         payload: dict = jwt.decode(
             access_token, self.secret_key, algorithms=[self.jwt_algorithm]
         )
         # expire: 원래는 여기서 토큰의 만료 기간을 검증하는 부분 필요하나 우리는 거기까지 안 할 것임
         return payload['sub'] # username
+    
+    @staticmethod                                   # 추가
+	def create_otp() -> int:                        # 추가
+        return random.randint(1000, 9999)           # 추가

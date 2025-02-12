@@ -12,3 +12,6 @@ class SignUpRequest(BaseModel):
 class LogInRequest(BaseModel):
     username: str
     password: str
+
+class CreateOTPReqeust(BaseModel):  # 추가
+    email: str

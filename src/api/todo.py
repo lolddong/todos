@@ -17,13 +17,11 @@ def get_todos_handler(
     order: str | None = None,
     user_service: UserService = Depends(),
     user_repo: UserRepository = Depends(),
-    # todo_repo: ToDoRepository = Depends(),             # 삭제
 ) -> ToDoListSchema:
-    username: str = user_service.decode_jwt(access_token=access_token)  # 이 username을 통해 사용자 조회
-    user: User | None = user_repo.get_user_by_username(username=username)  # 이 user_id를 통해 User(테이블)를 불러와 User에 담긴 ToDo 조회
+    username: str = user_service.decode_jwt(access_token=access_token)      # 이 username을 통해 사용자 조회
+    user: User | None = user_repo.get_user_by_username(username=username)   # 이 user_id를 통해 User(테이블)를 불러와 User에 담긴 ToDo 조회
     if not user: # 회원 탈퇴, etc. 경우
         raise HTTPException(status_code=404, detail='User Not Found')
-    # todos: List[ToDo] = todo_repo.get_todos()         # 삭제
     todos: List[ToDo] = user.todos                      # User에 있는 ToDo들을 todos에 담음
     if order and order == "DESC":
         return ToDoListSchema(
