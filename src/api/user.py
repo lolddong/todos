@@ -1,12 +1,12 @@
 # /c/Users/관리자/Desktop/projects/todos/src/api/user.py 내용
 from fastapi import Body, HTTPException, Depends, APIRouter
-from src.schema.request import SignUpRequest, LogInRequest, CreateOTPRequest
+from src.schema.request import SignUpRequest, LogInRequest, CreateOTPRequest, VerifyOTPRequest  # 추가
 from src.schema.response import UserSchema, JWTResponse
 from src.service.user import UserService
 from src.database.orm import User
 from src.database.repository import UserRepository
-from src.security import get_access_token       # 추가
-from src.cache import redis_client              # 추가
+from src.security import get_access_token
+from src.cache import redis_client
 
 router = APIRouter(prefix="/users")
 
@@ -56,9 +56,9 @@ def user_log_in_handler(
     # jwt 반환
     return JWTResponse(access_token=access_token)
 
-@router.post('/email/otp')                      # 추가
+@router.post('/email/otp')
 def create_otp_handler(
-    request: CreateOTPRequest,                  # request body로 email 받음
+    request: CreateOTPRequest,                  # request body로 email 받음 (request가 get_access_token보다 위로 와야 에러 안 남)
     _: str = Depends(get_access_token),         # access_token 사용 (즉, 회원가입 한, 인증된 사용자만 이메일 인증 가능)
                                                     # 헤더에 access_token이 있어야지만 여기를 통과하지만, access_token을 여기 로직에서 사용할 것은 아니라서 지금은 _로 줄 것
                                                     # 즉, 헤더에 있는지 검증만 하고 실제로 이 값을 사용하지 않을 것
@@ -69,6 +69,22 @@ def create_otp_handler(
     redis_client.expire(request.email, 3 * 60)  # 초 단위로 전달해야됨
     return {'otp': otp}                         # OTP를 email에 전송하는 로직을 실습에선 간략하게 이렇게만 구현할 것
 
-@router.post('/email/otp/verify')
-def verify_otp_handler():
-    return
+@router.post('/email/otp/verify')           # 추가
+def verify_otp_handler(
+    request: VerifyOTPRequest,                      # request body로 email, otp 받음 (request가 get_access_token보다 위로 와야 에러 안 남)
+    access_token: str = Depends(get_access_token),   # access_token 사용 (즉, 회원가입 한, 인증된 사용자만 요청 가능)
+    user_service: UserService = Depends(),
+    user_repo: UserRepository = Depends(),
+    ):
+
+    # request로 받은 otp와 redis.get(email)로 받은 otp 비교하여 이메일 인증
+    otp: str | None = redis_client.get(request.email)   # key가 잘못됬거나 만료 시 None 반환
+    if not otp:
+        raise HTTPException(status_code=400, detail='Bad Request')
+    if request.otp != int(otp):
+        raise HTTPException(status_code=400, detail='Bad Request')
+    username: str = user_service.decode_jwt(access_token=access_token)
+    user: User | None = user_repo.get_user_by_username(username)
+    if not user:
+        raise HTTPException(status_code=404, detail='User Not Found')
+    return UserSchema.from_orm(user)                # User가 잘 조회되는지 확인 (user에 email 저장하는 실습은 아직 진행 안 함)
