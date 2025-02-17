@@ -1,5 +1,5 @@
 # /c/Users/관리자/Desktop/projects/todos/src/api/user.py 내용
-from fastapi import Body, HTTPException, Depends, APIRouter
+from fastapi import Body, HTTPException, Depends, APIRouter, BackgroundTasks    # 추가
 from src.schema.request import SignUpRequest, LogInRequest, CreateOTPRequest, VerifyOTPRequest  # 추가
 from src.schema.response import UserSchema, JWTResponse
 from src.service.user import UserService
@@ -69,9 +69,10 @@ def create_otp_handler(
     redis_client.expire(request.email, 3 * 60)  # 초 단위로 전달해야됨
     return {'otp': otp}                         # OTP를 email에 전송하는 로직을 실습에선 간략하게 이렇게만 구현할 것
 
-@router.post('/email/otp/verify')           # 추가
+@router.post('/email/otp/verify')           # 수정
 def verify_otp_handler(
     request: VerifyOTPRequest,                      # request body로 email, otp 받음 (request가 get_access_token보다 위로 와야 에러 안 남)
+    background_tasks: BackgroundTasks,      # 추가
     access_token: str = Depends(get_access_token),   # access_token 사용 (즉, 회원가입 한, 인증된 사용자만 요청 가능)
     user_service: UserService = Depends(),
     user_repo: UserRepository = Depends(),
@@ -87,4 +88,11 @@ def verify_otp_handler(
     user: User | None = user_repo.get_user_by_username(username)
     if not user:
         raise HTTPException(status_code=404, detail='User Not Found')
-    return UserSchema.from_orm(user)                # User가 잘 조회되는지 확인 (user에 email 저장하는 실습은 아직 진행 안 함)
+    # save email to user
+    	# 실습에서는 사용자 이메일을 저장했다고 가정하고 진행
+    # send email to user                                           # 추가
+    background_tasks.add_task(                                     # 추가
+        user_service.send_email_to_user,                           # 추가
+        email='admin@fastapi.com'                                  # 추가
+    )
+    return UserSchema.from_orm(user)                # User가 잘 조회되는지 확인
